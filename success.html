@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asante!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000; /* Nyeusi kabisa */
+        }
+        
+        /* Nime-copy style za video card kutoka index.html */
+        .video-card {
+            background-color: transparent;
+        }
+        .video-thumbnail-wrapper {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+            background-color: #111; /* Dark placeholder */
+            overflow: hidden; 
+            border: 1px solid #222; 
+            border-radius: 0.25rem; 
+        }
+        .video-thumbnail {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .video-duration {
+            position: absolute;
+            bottom: 0.25rem;
+            right: 0.25rem;
+            background-color: rgba(0, 0, 0, 0.75);
+            color: white;
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .video-play-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 3.5rem; /* w-14 */
+            height: 3.5rem; /* h-14 */
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .video-title {
+            font-weight: 600;
+            font-size: 0.875rem; /* text-sm */
+            color: #D1D5DB; /* text-gray-300 */
+            margin-top: 0.5rem;
+            line-height: 1.3;
+        }
+        .video-metadata {
+            font-size: 0.75rem; /* text-xs */
+            color: #9CA3AF; /* text-gray-400 */
+            margin-top: 0.125rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-300">
+
+    <!-- Header (Consistent na index.html) -->
+    <nav class="bg-gray-900 sticky top-0 z-40 border-b border-gray-700">
+        <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <!-- Logo -->
+                <div class="flex items-center space-x-8">
+                    <a href="index.html" class="flex-shrink-0 flex items-center">
+                        <h1 class="text-3xl font-bold text-red-600">PENZIS</h1>
+                    </a>
+                </div>
+                <!-- Login Button (Placeholder) -->
+                <div class="flex items-center space-x-4">
+                    <a href="#" class="bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-700">
+                        My Account
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+        <!-- Kichwa cha 'Success' -->
+        <div class="bg-gray-800 rounded-lg shadow-xl p-8 max-w-2xl w-full text-center mx-auto border border-gray-700">
+            <!-- Success Icon -->
+            <svg class="h-16 w-16 text-green-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            
+            <h1 class="text-3xl font-bold text-white mb-2">Malipo Yamekamilika!</h1>
+            <p class="text-gray-400 text-lg mb-6">
+                Asante! Sasa una access ya video zote. Bonyeza kitufe hapa chini.
+            </p>
+
+            <!-- 
+            ====================================================================
+            HII NDIO LINK PLACEHOLDER YAKO MUHIMU
+            Weka link ya video zako kamili kwenye `href` hapa chini
+            ====================================================================
+            -->
+            <a href="httpsE://your-full-video-page-link.com" class="inline-block bg-red-600 text-white py-3 px-8 rounded-lg font-semibold text-lg hover:bg-red-700 transition-colors shadow-lg transform hover:scale-105">
+                Anza Kuangalia Sasa
+            </a>
+            
+            <!-- Maelezo ya Transaction (kutoka kwenye URL) -->
+            <div class="mt-8 text-left bg-gray-900 p-4 rounded-lg border border-gray-700">
+                <h3 class="font-semibold text-white">Transaction Details:</h3>
+                <code id="query-params" class="block text-xs text-gray-400 p-2 rounded mt-2 whitespace-pre-wrap">Loading...</code>
+            </div>
+        </div>
+
+        <!-- 
+        ====================================================================
+        TEASER VIDEOS HAPA CHINI (KAMA ULIVYOOMBA)
+        ====================================================================
+        -->
+        <div class="border-t border-gray-700 mt-12 pt-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-semibold tracking-tight text-white">Video Hizi Zinakusubiri...</h2>
+            </div>
+            
+            <div id="video-grid-teasers" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-8">
+                
+                <!-- Teaser 1 -->
+                <div class="video-card">
+                    <div class="video-thumbnail-wrapper">
+                        <video src="https://static-eu-cdn.eporner.com/thumbs/static4/1/14/147/14715721/14715721-preview.webm" muted loop playsinline preload="metadata" class="video-thumbnail" loading="lazy" onerror="this.parentElement.parentElement.style.display='none'"></video>
+                        <div class="video-duration">5:30</div>
+                        <svg class="video-play-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" /></svg>
+                    </div>
+                    <div><h3 class="video-title">Video Mpya Kabisa</h3><p class="video-metadata">12K views &bull; 1 day ago</p></div>
+                </div>
+                <!-- Teaser 2 -->
+                <div class="video-card">
+                    <div class="video-thumbnail-wrapper">
+                        <video src="https://static-eu-cdn.eporner.com/thumbs/static4/1/14/145/14574312/14574312-preview.webm" muted loop playsinline preload="metadata" class="video-thumbnail" loading="lazy" onerror="this.parentElement.parentElement.style.display='none'"></video>
+                        <div class="video-duration">7:12</div>
+                        <svg class="video-play-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" /></svg>
+                    </div>
+                    <div><h3 class="video-title">Cheki Hii Kali</h3><p class="video-metadata">18K views &bull; 2 days ago</p></div>
+                </div>
+                <!-- Teaser 3 -->
+                <div class="video-card">
+                    <div class="video-thumbnail-wrapper">
+                        <img src="https://static-eu-cdn.eporner.com/thumbs/static4/1/13/139/13976391/2_240.jpg" alt="Video thumbnail" class="video-thumbnail" loading="lazy" onerror="this.parentElement.parentElement.style.display='none'">
+                        <div class="video-duration">10:05</div>
+                        <svg class="video-play-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" /></svg>
+                    </div>
+                    <div><h3 class="video-title">Utamu Mtupu</h3><p class="video-metadata">25K views &bull; 3 days ago</p></div>
+                </div>
+                <!-- Teaser 4 -->
+                <div class="video-card">
+                    <div class="video-thumbnail-wrapper">
+                        <video src="https://static-eu-cdn.eporner.com/thumbs/static4/1/14/145/14573988/14573988-preview.webm" muted loop playsinline preload="metadata" class="video-thumbnail" loading="lazy" onerror="this.parentElement.parentElement.style.display='none'"></video>
+                        <div class="video-duration">4:20</div>
+                        <svg class="video-play-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" /></svg>
+                    </div>
+                    <div><h3 class="video-title">Full Shangwe</h3><p class="video-metadata">19K views &bull; 3 days ago</p></div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer (Consistent na index.html) -->
+    <footer class="bg-gray-900 mt-12 py-8 border-t border-gray-700">
+        <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-500 text-sm">
+            &copy; 2025 PenziS. Haki zote zimehifadhiwa.
+        </div>
+    </footer>
+
+    <script>
+        // Hii script inasoma tu parameters kutoka kwenye URL
+        // (k.m., ?order_id=...&status=...)
+        // na kuzionyesha kwenye lile box la 'Transaction Details'.
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const paramBox = document.getElementById('query-params');
+            if (params.toString()) {
+                let text = '';
+                params.forEach((value, key) => {
+                    text += `${key}: ${value}\n`;
+                });
+                paramBox.textContent = text;
+            } else {
+                paramBox.textContent = 'No query parameters found in URL.';
+            }
+
+            // Kufanya teaser videos zicheze kwenye hover
+            document.querySelectorAll('video.video-thumbnail').forEach(video => {
+                video.addEventListener('mouseover', () => {
+                    video.play().catch(e => {});
+                });
+                video.addEventListener('mouseout', () => {
+                    video.pause();
+                    video.currentTime = 0;
+                });
+            });
+        });
+    </script>
+</body>
+</html>

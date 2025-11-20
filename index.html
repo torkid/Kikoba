@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Zote Mpya</title>
+    <!-- Script ya Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font ya Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000; /* Nyeusi kabisa */
+        }
+        
+        /* Video Card Styles (Pro Version) */
+        .video-card {
+            cursor: pointer;
+            background-color: transparent;
+        }
+        .video-thumbnail-wrapper {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+            background-color: #111; /* Dark placeholder */
+            overflow: hidden; /* Muhimu kwa hover effect */
+            border: 1px solid #222; /* Border nyepesi sana */
+            border-radius: 0.25rem; /* Rounded corners kidogo */
+        }
+        .video-thumbnail {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease-in-out;
+        }
+        /* UPDATED: Hover sasa haichezeshi video, inakuza tu */
+        .video-card:hover .video-thumbnail {
+            transform: scale(1.05);
+        }
+        .video-card:hover .video-title {
+            color: #DC2626; /* text-red-600 */
+        }
+        
+        .video-duration {
+            position: absolute;
+            bottom: 0.25rem;
+            right: 0.25rem;
+            background-color: rgba(0, 0, 0, 0.75);
+            color: white;
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .video-play-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 3.5rem; /* w-14 */
+            height: 3.5rem; /* h-14 */
+            color: rgba(255, 255, 255, 0.7);
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+            transition: all 0.2s ease;
+        }
+        .video-card:hover .video-play-icon {
+            color: rgba(255, 255, 255, 0.9);
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+        
+        .video-title {
+            font-weight: 600;
+            font-size: 0.875rem; /* text-sm */
+            color: #D1D5DB; /* text-gray-300 */
+            transition: color 0.2s ease-in-out;
+            margin-top: 0.5rem;
+            line-height: 1.3;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            min-height: 2.6em;
+        }
+        .video-metadata {
+            font-size: 0.75rem; /* text-xs */
+            color: #9CA3AF; /* text-gray-400 */
+            margin-top: 0.125rem;
+        }
+        
+        /* Pagination Styles */
+        .pagination-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 1rem;
+            margin: 0 0.125rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #D1D5DB; /* text-gray-300 */
+            background-color: #1F2937; /* bg-gray-800 */
+            border: 1px solid #374151; /* bg-gray-700 */
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .pagination-link:hover {
+            background-color: #374151; /* bg-gray-700 */
+            color: #fff;
+        }
+        .pagination-link.active {
+            background-color: #DC2626; /* bg-red-600 */
+            border-color: #DC2626;
+            color: #fff;
+            z-index: 10;
+        }
+        .pagination-link.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body class="text-gray-300">
+
+    <!-- Header / Nav (Pro Version) -->
+    <nav class="bg-gray-900 sticky top-0 z-40 border-b border-gray-700">
+        <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <!-- Logo & Nav Links -->
+                <div class="flex items-center space-x-8">
+                    <a href="#" class="flex-shrink-0 flex items-center video-trigger">
+                        <h1 class="text-3xl font-bold text-red-600">PENZIS</h1>
+                    </a>
+                    <div class="hidden sm:flex sm:space-x-6">
+                        <a href="#" class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-gray-700 video-trigger">Categories</a>
+                        <a href="#" class="px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-700 video-trigger">New</a>
+                        <a href="#" class="px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-700 video-trigger">Popular</a>
+                        <a href="#" class="px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-700 video-trigger">Live</a>
+                    </div>
+                </div>
+                
+                <!-- Search Bar & Login -->
+                <div class="flex items-center space-x-4">
+                    <div class="flex-1 max-w-xs w-full hidden md:block">
+                        <label for="search" class="sr-only">Search</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <input id="search" name="search" class="block w-full bg-gray-800 border border-transparent rounded-md py-2 pl-10 pr-3 text-sm placeholder-gray-400 text-white focus:outline-none focus:bg-white focus:text-gray-900 focus:placeholder-gray-500 focus:ring-0 focus:border-transparent" placeholder="Search" type="search">
+                        </div>
+                    </div>
+                    <button class="bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-700 video-trigger">
+                        Login
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- SECTION 1 (CATEGORIES) -->
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-semibold tracking-tight text-white">Video Mpya Zaidi</h2>
+            <a href="#" class="text-sm font-medium text-red-500 hover:text-red-400 video-trigger">View All &rarr;</a>
+        </div>
+        <div id="video-grid-1" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-8">
+            <!-- Video cards zitaingia hapa kwa JavaScript -->
+        </div>
+
+        <!-- SECTION 2 (CATEGORIES) -->
+        <div class="border-t border-gray-700 mt-12 pt-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-semibold tracking-tight text-white">Zinazotrend</h2>
+                <a href="#" class="text-sm font-medium text-red-500 hover:text-red-400 video-trigger">View All &rarr;</a>
+            </div>
+            <div id="video-grid-2" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-8">
+                <!-- Video cards zitaingia hapa kwa JavaScript -->
+            </div>
+        </div>
+
+        <!-- SECTION 3 (CATEGORIES) -->
+        <div class="border-t border-gray-700 mt-12 pt-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-semibold tracking-tight text-white">Zilipendwa</h2>
+                <a href="#" class="text-sm font-medium text-red-500 hover:text-red-400 video-trigger">View All &rarr;</a>
+            </div>
+            <div id="video-grid-3" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-8">
+                <!-- Video cards zitaingia hapa kwa JavaScript -->
+            </div>
+        </div>
+
+        <!-- PAGINATION -->
+        <nav class="flex justify-center items-center space-x-1 mt-12 pt-8 border-t border-gray-700" aria-label="Pagination">
+            <a href="#" class="pagination-link disabled video-trigger">
+                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+                <span class="hidden sm:inline ml-1">Prev</span>
+            </a>
+            <a href="#" class="pagination-link active video-trigger">1</a>
+            <a href="#" class="pagination-link video-trigger">2</a>
+            <a href="#" class="pagination-link video-trigger">3</a>
+            <span class="pagination-link disabled hidden sm:flex">...</span>
+            <a href="#" class="pagination-link video-trigger">8</a>
+            <a href="#" class="pagination-link video-trigger">
+                <span class="hidden sm:inline mr-1">Next</span>
+                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                </svg>
+            </a>
+        </nav>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 mt-12 py-8 border-t border-gray-700">
+        <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-500 text-sm">
+            &copy; 2025 PenziS. Haki zote zimehifadhiwa.
+        </div>
+    </footer>
+
+
+    <!-- 
+    ====================================================================
+    MODAL YA MALIPO (PAYMENT MODAL)
+    UPDATED: Imebadilishwa logo kama ulivyoomba
+    ====================================================================
+    -->
+    <div id="modal-overlay" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 hidden transition-opacity duration-300">
+        
+        <div id="payment-modal" class="bg-white rounded-lg shadow-2xl p-6 w-11/12 max-w-sm relative transition-all duration-300">
+            
+            <button id="close-btn" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+
+            <div class="mx-auto flex items-center justify-center h-10 w-10 rounded-full bg-red-600 mb-3">
+                <span class="text-white text-md font-bold">18+</span>
+            </div>
+
+            <!-- Form Content -->
+            <div id="form-content">
+                <h3 class="text-xl font-bold text-center text-gray-900 mb-1">
+                    LIPIA TSH 1000/= TU.
+                </h3>
+                <p class="text-gray-600 text-center text-sm mb-4">
+                    Fungua video zote za kikubwa na connection kali za mjini.
+                </p>
+
+                <form id="payment-form">
+                    <div>
+                        <label for="phone" class="block text-xs font-medium text-gray-700 mb-1">
+                            Weka namba yako ya pesa <span class="text-red-500">*</span>
+                        </label>
+                        <input type="tel" 
+                               name="phone" 
+                               id="phone" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all text-gray-900 text-sm" 
+                               placeholder="07XXXXXXXX">
+                    </div>
+
+                    <button type="submit" id="submit-button" class="w-full bg-red-600 text-white py-2 px-4 rounded-md font-semibold flex items-center justify-center gap-2 hover:bg-red-700 transition-colors mt-4 shadow-md text-sm">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z" clip-rule="evenodd"></path></svg>
+                        <span>LIPIA SASA</span>
+                    </button>
+                </form>
+
+                <p class="text-center text-gray-500 text-xs mt-3 flex items-center justify-center gap-1.5">
+                    <svg class="w-3 h-3 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z" clip-rule="evenodd"></path></svg>
+                    Secure Payment
+                </p>
+                <!-- NEW: Imebadilishwa kutumia logo uliyotuma -->
+                <div class="flex justify-center my-3">
+                    <img src="https://i.ibb.co/jvqbh208/zenopay-logo.png" alt="zenopay-logo" border="0" class="h-8 w-auto" onerror="this.style.display='none'">
+                </div>
+                
+                <p class="text-center text-gray-500" style="font-size: 10px;">
+                    You're supporting PenziS with this payment.
+                </p>
+            </div>
+
+            <!-- Message Content (kwa ajili ya loading/error) -->
+            <div id="message-content" class="hidden text-center">
+                <div id="message-spinner" class="hidden">
+                    <svg class="animate-spin h-10 w-10 text-red-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path classs="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <h3 class="text-md font-medium text-gray-800 mt-2">Inasubiri malipo...</h3>
+                    <p class="text-gray-600 text-sm mt-1">Tafadhali kamilisha malipo kwenye simu yako.</p>
+                </div>
+                
+                <div id="message-error" class="hidden">
+                    <svg class="h-10 w-10 text-red-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <h3 class="text-md font-medium text-gray-800 mt-2">Oops! Imetokea hitilafu.</h3>
+                    <p id="error-text" class="text-gray-600 text-sm mt-1">Namba ya simu si sahihi.</p>
+                    <button id="try-again-btn" class="mt-3 w-full bg-red-600 text-white py-2 px-4 rounded-md font-semibold hover:bg-red-700 transition-colors text-sm">
+                        Jaribu Tena
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <script>
+        // Links zote ulizonipa
+        const videoLinks = [
+            "https://static-eu-cdn.eporner.com/thumbs/static4/1/14/147/14715721/14715721-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/14/145/14574312/14574312-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/14/145/14573992/14573992-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/14/145/14573988/14573988-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/14/145/14540948/14540948-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/14/145/14540880/14540880-preview.webm",
+            "https://static-eu-cdn.eporner.com/thumbs/static4/1/14/145/14540873/14540873-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/14/143/14354675/14354675-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/14/143/14341601/14341601-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/14/143/14341577/14341577-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/14/140/14084170/14084170-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/14/140/14084058/14084058-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/14/140/14062364/14062364-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/13/139/13976391/2_240.jpg",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/13/138/13809075/13809075-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/13/136/13647975/13647975-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/13/135/13531336/13531336-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/13/134/13490416/13490416-preview.webm",
+            "https://static-eu-cdn.eporner.com/thumbs/static4/1/13/134/13490373/13490373-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/13/134/13490317/13490317-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/13/134/13489977/13489977-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/13/134/13489877/13489877-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/13/134/13488662/13488662-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/13/134/13488496/13488496-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/13/134/13408356/13408356-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/12/129/12970319/12970319-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/12/129/12955831/12955831-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/12/129/12955801/12955801-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/12/129/12942650/1_240.jpg",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/15/150/15072438/15072438-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/14/140/14056187/14056187-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/14/140/14041042/14041042-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/14/140/14040963/14040963-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/14/140/14040939/14040939-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/13/139/13967284/13967284-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/13/139/13955903/13955903-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/13/139/13933150/13933150-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/13/138/13841101/13841101-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/13/133/13365658/13365658-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/13/132/13222340/13222340-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/13/131/13194633/6_240.jpg",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/13/131/13142077/13142077-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/13/131/13195057/2_240.jpg",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/13/130/13013907/13013907-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/13/134/13488662/13488662-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/9/93/935/9359672/9359672-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/12/127/12760030/12760030-preview.webm",
+            "https.www.empressleak.xyz/media/videos/tmb/7072/video.webm",
+            "https.www.empressleak.xyz/media/videos/tmb/6995/video.webm",
+            "https.www.empressleak.xyz/media/videos/tmb/6892/video.webm",
+            "https.www.empressleak.xyz/media/videos/tmb/6777/video.webm",
+            "https.www.empressleak.xyz/media/videos/tmb/6726/video.webm",
+            "https.www.empressleak.xyz/media/videos/tmb/6673/video.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/14/141/14181416/14181416-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/14/141/14181442/14181442-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/14/141/14179568/14179568-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/14/141/14181491/14181491-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/13/138/13844503/13844503-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/11/119/11940424/11940424-preview.webm",
+            "https.static-eu-cdn.eporner.com/thumbs/static4/1/14/144/14435745/14435745-preview.webm"
+        ];
+        
+        // --- NEW: Function ya kuchanganya array (Fisher-Yates Shuffle) ---
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // --- Function ya Kujaza Video Grid ---
+        function populateGrid(gridId, links) {
+            const grid = document.getElementById(gridId);
+            if (!grid) return;
+            
+            const titles = ["Video Mpya Kabisa", "Cheki Hii Kali", "Utamu Mtupu", "Full Shangwe", "Usipitwe Hii", "Ya Moto", "Kibao Kipya", "Hatari Fire"];
+            
+            links.forEach((url, index) => {
+                // Safisha URLs zenye makosa
+                let cleanUrl = url.replace(/^(httpss::|https::|httpsV:|https\.)/, 'https://');
+                
+                const isJpg = cleanUrl.endsWith('.jpg');
+                let thumbnailHtml;
+
+                // NEW: Kutumia data-src kwa ajili ya lazy loading
+                if (isJpg) {
+                    // NEW: Nimeongeza native loading="lazy" kwa optimization zaidi
+                    thumbnailHtml = `<img data-src="${cleanUrl}" alt="Video thumbnail" class="video-thumbnail lazy-load" loading="lazy" onerror="this.parentElement.parentElement.style.display='none'">`;
+                } else {
+                    thumbnailHtml = `<video data-src="${cleanUrl}" muted loop playsinline preload="metadata" class="video-thumbnail lazy-load" onerror="this.parentElement.parentElement.style.display='none'"></video>`;
+                }
+
+                const title = titles[index % titles.length];
+                const duration = `${Math.floor(Math.random() * 10) + 2}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')}`;
+                const views = `1${Math.floor(Math.random() * 9)}K`;
+
+                const card = document.createElement('div');
+                card.className = 'video-card video-trigger'; // Kila card sasa ni "trigger"
+                card.innerHTML = `
+                    <div class="video-thumbnail-wrapper">
+                        ${thumbnailHtml}
+                        <div class="video-duration">${duration}</div>
+                        <svg class="video-play-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="video-title">${title}</h3>
+                        <p class="video-metadata">${views} views &bull; 2 days ago</p>
+                    </div>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+        
+        // NEW: Lazy Loading function
+        function setupLazyLoading() {
+            const lazyElements = document.querySelectorAll('.lazy-load');
+
+            if ('IntersectionObserver' in window) {
+                const observer = new IntersectionObserver((entries, obs) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const el = entry.target;
+                            el.src = el.dataset.src;
+                            el.classList.remove('lazy-load');
+                            obs.unobserve(el); // Acha kuangalia hiki element
+                        }
+                    });
+                }, { rootMargin: "0px 0px 200px 0px" }); // Anza kuload 200px kabla hazijafika
+
+                lazyElements.forEach(el => observer.observe(el));
+            } else {
+                // Fallback kwa browsers za kizamani
+                lazyElements.forEach(el => {
+                    el.src = el.dataset.src;
+                    el.classList.remove('lazy-load');
+                });
+            }
+        }
+
+        // --- Kufunga Logic Kwenye DOMContentLoaded ---
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // NEW: Changanya array kwanza
+            shuffleArray(videoLinks);
+
+            // Jaza grid kwa categories
+            populateGrid('video-grid-1', videoLinks.slice(0, 20)); 
+            populateGrid('video-grid-2', videoLinks.slice(20, 40)); 
+            populateGrid('video-grid-3', videoLinks.slice(40)); 
+
+            // Anzisha lazy loading
+            setupLazyLoading();
+
+            // --- NEW: Nimeondoa ile 'mouseover' play function iliyokuwa inafanya page iwe nzito ---
+            // (Hakuna code hapa sasa)
+
+            // --- Kufanya KILA card ifungue modal ---
+            document.querySelectorAll('.video-trigger').forEach(trigger => {
+                trigger.addEventListener('click', (e) => {
+                    e.preventDefault(); 
+                    showModal(); // Onyesha modal ya malipo
+                });
+            });
+        });
+
+
+        // --- CODE YA MODAL (IMEFUPISHWA) ---
+
+        const modalOverlay = document.getElementById('modal-overlay');
+        const closeBtn = document.getElementById('close-btn');
+
+        function showModal() {
+            modalOverlay.classList.remove('hidden');
+        }
+        function hideModal() {
+            modalOverlay.classList.add('hidden');
+            showForm(); 
+        }
+
+        closeBtn.addEventListener('click', hideModal);
+        
+        modalOverlay.addEventListener('click', function(event) {
+            if (event.target === modalOverlay) {
+                hideModal();
+            }
+        });
+
+        const paymentForm = document.getElementById('payment-form');
+        const submitButton = document.getElementById('submit-button');
+        const formContent = document.getElementById('form-content');
+        const messageContent = document.getElementById('message-content');
+        const spinner = document.getElementById('message-spinner');
+        const errorMsg = document.getElementById('message-error');
+        const errorText = document.getElementById('error-text');
+        const phoneInput = document.getElementById('phone');
+        const tryAgainBtn = document.getElementById('try-again-btn');
+
+        function showForm() {
+            formContent.classList.remove('hidden');
+            messageContent.classList.add('hidden');
+            spinner.classList.add('hidden');
+            errorMsg.classList.add('hidden');
+            submitButton.disabled = false;
+            submitButton.innerHTML = `
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z" clip-rule="evenodd"></path></svg>
+                <span>LIPIA SASA</span>`;
+        }
+
+        function showMessage(type) {
+            formContent.classList.add('hidden');
+            messageContent.classList.remove('hidden');
+            spinner.classList.add('hidden');
+            errorMsg.classList.add('hidden');
+            if (type === 'spinner') spinner.classList.remove('hidden');
+            if (type === 'error') errorMsg.classList.remove('hidden');
+        }
+        
+        paymentForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const phoneNumber = phoneInput.value;
+            if (phoneNumber.length < 9) {
+                errorText.textContent = 'Namba ya simu si sahihi.';
+                showMessage('error');
+                return;
+            }
+
+            submitButton.disabled = true;
+            submitButton.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Inashughulikia...</span>`;
+            
+            try {
+                const response = await fetch('create_order.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone: phoneNumber })
+                });
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    showMessage('spinner');
+                } else {
+                    errorText.textContent = data.message || 'Hitilafu imetokea.';
+                    showMessage('error');
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+                errorText.textContent = 'Hitilafu ya mtandao. Jaribu tena.';
+                showMessage('error');
+            }
+        });
+
+        tryAgainBtn.addEventListener('click', showForm);
+    </script>
+</body>
+</html>
